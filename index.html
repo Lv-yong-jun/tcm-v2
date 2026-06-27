@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>中医体质自测 · 吕勇军·健康+保险</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(135deg, #fef9e7 0%, #fdebd0 100%);
+  color: #333;
+  line-height: 1.6;
+  padding: 12px;
+  min-height: 100vh;
+}
+.header {
+  text-align: center;
+  padding: 20px 16px 16px;
+  background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+  border-radius: 16px;
+  color: white;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(192,57,43,0.3);
+}
+.header h1 { font-size: 22px; margin-bottom: 6px; letter-spacing: 2px; }
+.header p { font-size: 13px; opacity: 0.9; }
+.header .sub { font-size: 11px; opacity: 0.7; margin-top: 6px; }
+
+.section {
+  background: white;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+.section-header {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.section-header .left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #c0392b;
+}
+.section-icon { font-size: 20px; }
+.section-count {
+  font-size: 12px;
+  color: #999;
+  background: #f5f5f5;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.section-toggle {
+  font-size: 18px;
+  color: #ccc;
+  transition: transform 0.3s;
+}
+.section.open .section-toggle { transform: rotate(180deg); }
+
+.section-content {
+  display: none;
+  padding: 0 16px 16px;
+}
+.section.open .section-content { display: block; }
+
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1.5px solid #eee;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.checkbox-item:active { transform: scale(0.98); }
+.checkbox-item.checked {
+  border-color: #c0392b;
+  background: #fef9e7;
+}
+.checkbox-item input { display: none; }
+.checkbox-item .box {
+  width: 20px; height: 20px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  margin-right: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: white;
+  transition: all 0.2s;
+}
+.checkbox-item.checked .box {
+  background: #c0392b;
+  border-color: #c0392b;
+}
+.checkbox-item .box::after { content: ''; }
+.checkbox-item.checked .box::after { content: '✓'; }
+.checkbox-item .label { font-size: 13px; color: #333; line-height: 1.3; }
+.checkbox-item.checked .label { color: #c0392b; font-weight: 500; }
+
+.counter {
+  text-align: center;
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 6px;
+}
+.counter span { color: #c0392b; font-weight: 700; font-size: 18px; }
+
+.btn-area {
+  padding: 10px 0 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.btn {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 2px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(192,57,43,0.4);
+}
+.btn-primary:active { transform: scale(0.98); opacity: 0.9; }
+.btn-secondary {
+  background: white;
+  color: #c0392b;
+  border: 2px solid #c0392b;
+}
+.btn-secondary:active { background: #fef9e7; }
+
+.result-area { display: none; }
+.result-area.show { display: block; }
+
+.result-card {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.result-card h3 {
+  font-size: 16px;
+  color: #c0392b;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #fdebd0;
+}
+.result-card p, .result-card li {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #444;
+}
+.result-card ul { padding-left: 18px; }
+.result-card li { margin-bottom: 6px; }
+
+.tip-box {
+  background: #fef9e7;
+  border-left: 4px solid #f39c12;
+  padding: 12px;
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #666;
+  margin-top: 10px;
+}
+
+.disclaimer {
+  background: #f8f9fa;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 16px;
+  font-size: 12px;
+  color: #999;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.footer {
+  text-align: center;
+  padding: 16px;
+  font-size: 12px;
+  color: #bbb;
+}
+.footer .name { color: #c0392b; font-weight: 600; }
+
+.loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  font-size: 14px;
+}
+.loading .spinner {
+  width: 36px; height: 36px;
+  border: 3px solid #fdebd0;
+  border-top: 3px solid #c0392b;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div id="page-form">
+  <div class="header">
+    <h1>🏥 中医体质自测</h1>
+    <p>46年执业老中医 · 双逻辑辨证</p>
+    <div class="sub">勾选身体信号 → 获取专属调理方案</div>
+  </div>
+
+  <div class="counter">已勾选 <span id="checkCount">0</span> 项信号</div>
+
+  <!-- 睡眠类 6项 -->
+  <div class="section" data-category="sleep">
+    <div class="section-header">
+      <div class="left">
+        <span class="section-icon">😴</span>
+        <span class="section-title">睡眠类</span>
+        <span class="section-count">6项</span>
+      </div>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-content">
+      <div class="checkbox-grid">
+        <div class="checkbox-item" data-cb><input type="checkbox" value="入睡难"><div class="box"></div><div class="label">入睡难</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="多梦易醒"><div class="box"></div><div class="label">多梦易醒</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="早醒"><div class="box"></div><div class="label">早醒</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="嗜睡"><div class="box"></div><div class="label">嗜睡</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="睡醒乏力"><div class="box"></div><div class="label">睡醒乏力</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="失眠多梦"><div class="box"></div><div class="label">失眠多梦</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 头部五官类 15项(精选) -->
+  <div class="section" data-category="head">
+    <div class="section-header">
+      <div class="left">
+        <span class="section-icon">🧠</span>
+        <span class="section-title">头部五官类</span>
+        <span class="section-count">15项</span>
+      </div>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-content">
+      <div class="checkbox-grid">
+        <div class="checkbox-item" data-cb><input type="checkbox" value="头晕"><div class="box"></div><div class="label">头晕</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="头沉"><div class="box"></div><div class="label">头沉</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="频繁头痛"><div class="box"></div><div class="label">频繁头痛</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="偏头痛"><div class="box"></div><div class="label">偏头痛</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="耳鸣"><div class="box"></div><div class="label">耳鸣</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="听力下降"><div class="box"></div><div class="label">听力下降</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="眼干"><div class="box"></div><div class="label">眼干</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="视物模糊"><div class="box"></div><div class="label">视物模糊</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="眼疲劳"><div class="box"></div><div class="label">眼疲劳</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="脱发白发"><div class="box"></div><div class="label">脱发白发</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="鼻塞鼻炎"><div class="box"></div><div class="label">鼻塞鼻炎</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="打呼噜"><div class="box"></div><div class="label">打呼噜</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="口苦口干"><div class="box"></div><div class="label">口苦口干</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="口臭"><div class="box"></div><div class="label">口臭</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="牙齿松动"><div class="box"></div><div class="label">牙齿松动</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 肠胃消化类 12项 -->
+  <div class="section" data-category="stomach">
+    <div class="section-header">
+      <div class="left">
+        <span class="section-icon">🍽️</span>
+        <span class="section-title">肠胃消化类</span>
+        <span class="section-count">12项</span>
+      </div>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-content">
+      <div class="checkbox-grid">
+        <div class="checkbox-item" data-cb><input type="checkbox" value="食欲不振"><div class="box"></div><div class="label">食欲不振</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="食欲过旺"><div class="box"></div><div class="label">食欲过旺</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="消化不良"><div class="box"></div><div class="label">消化不良</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="胃痛胃胀"><div class="box"></div><div class="label">胃痛胃胀</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="反酸"><div class="box"></div><div class="label">反酸</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="腹胀"><div class="box"></div><div class="label">腹胀</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="屁多屁臭"><div class="box"></div><div class="label">屁多屁臭</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="大便干结"><div class="box"></div><div class="label">大便干结</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="大便溏稀"><div class="box"></div><div class="label">大便溏稀</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="大便不成形"><div class="box"></div><div class="label">大便不成形</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="便秘腹泻交替"><div class="box"></div><div class="label">便秘腹泻交替</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="恶心打嗝"><div class="box"></div><div class="label">恶心打嗝</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 四肢躯干类 12项(精选) -->
+  <div class="section" data-category="limb">
+    <div class="section-header">
+      <div class="left">
+        <span class="section-icon">🦵</span>
+        <span class="section-title">四肢躯干类</span>
+        <span class="section-count">12项</span>
+      </div>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-content">
+      <div class="checkbox-grid">
+        <div class="checkbox-item" data-cb><input type="checkbox" value="手脚冰凉"><div class="box"></div><div class="label">手脚冰凉</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="手脚心发热"><div class="box"></div><div class="label">手脚心发热</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="肩颈酸痛"><div class="box"></div><div class="label">肩颈酸痛</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="腰酸痛"><div class="box"></div><div class="label">腰酸痛</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="关节痛"><div class="box"></div><div class="label">关节痛</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="四肢乏力"><div class="box"></div><div class="label">四肢乏力</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="水肿"><div class="box"></div><div class="label">水肿</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="手足麻木"><div class="box"></div><div class="label">手足麻木</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="静脉曲张"><div class="box"></div><div class="label">静脉曲张</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="容易扭伤"><div class="box"></div><div class="label">容易扭伤</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="形体消瘦"><div class="box"></div><div class="label">形体消瘦</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="肥胖带肚"><div class="box"></div><div class="label">肥胖带肚</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 全身代谢类 12项(精选) -->
+  <div class="section" data-category="metab">
+    <div class="section-header">
+      <div class="left">
+        <span class="section-icon">⚡</span>
+        <span class="section-title">全身代谢类</span>
+        <span class="section-count">12项</span>
+      </div>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-content">
+      <div class="checkbox-grid">
+        <div class="checkbox-item" data-cb><input type="checkbox" value="易疲劳"><div class="box"></div><div class="label">易疲劳</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="气短"><div class="box"></div><div class="label">气短</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="多汗"><div class="box"></div><div class="label">多汗</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="自汗盗汗"><div class="box"></div><div class="label">自汗盗汗</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="怕冷"><div class="box"></div><div class="label">怕冷</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="怕热"><div class="box"></div><div class="label">怕热</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="虚胖"><div class="box"></div><div class="label">虚胖</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="低血压"><div class="box"></div><div class="label">低血压</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="高血压"><div class="box"></div><div class="label">高血压</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="贫血"><div class="box"></div><div class="label">贫血</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="心慌胸闷"><div class="box"></div><div class="label">心慌胸闷</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="易感冒"><div class="box"></div><div class="label">易感冒</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 情绪心理类 7项 -->
+  <div class="section" data-category="emotion">
+    <div class="section-header">
+      <div class="left">
+        <span class="section-icon">😤</span>
+        <span class="section-title">情绪心理类</span>
+        <span class="section-count">7项</span>
+      </div>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-content">
+      <div class="checkbox-grid">
+        <div class="checkbox-item" data-cb><input type="checkbox" value="烦躁易怒"><div class="box"></div><div class="label">烦躁易怒</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="抑郁思虑"><div class="box"></div><div class="label">抑郁思虑</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="压力大"><div class="box"></div><div class="label">压力大</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="胸闷叹气"><div class="box"></div><div class="label">胸闷叹气</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="性格急躁"><div class="box"></div><div class="label">性格急躁</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="思维断电"><div class="box"></div><div class="label">思维断电</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="心烦狂躁"><div class="box"></div><div class="label">心烦狂躁</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 皮肤面色类 8项 -->
+  <div class="section" data-category="skin">
+    <div class="section-header">
+      <div class="left">
+        <span class="section-icon">🧴</span>
+        <span class="section-title">皮肤面色类</span>
+        <span class="section-count">8项</span>
+      </div>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-content">
+      <div class="checkbox-grid">
+        <div class="checkbox-item" data-cb><input type="checkbox" value="面色暗沉"><div class="box"></div><div class="label">面色暗沉</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="面黄苍白"><div class="box"></div><div class="label">面黄苍白</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="长痘痤疮"><div class="box"></div><div class="label">长痘痤疮</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="皮肤干燥"><div class="box"></div><div class="label">皮肤干燥</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="皮肤瘙痒"><div class="box"></div><div class="label">皮肤瘙痒</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="皮肤易青"><div class="box"></div><div class="label">皮肤易青</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="黑痣变多"><div class="box"></div><div class="label">黑痣变多</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="咽干咽痒"><div class="box"></div><div class="label">咽干咽痒</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 女性专属 10项(精选) -->
+  <div class="section" data-category="female">
+    <div class="section-header">
+      <div class="left">
+        <span class="section-icon">👩</span>
+        <span class="section-title">女性专属</span>
+        <span class="section-count">10项</span>
+      </div>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-content">
+      <div class="checkbox-grid">
+        <div class="checkbox-item" data-cb><input type="checkbox" value="宫寒痛经"><div class="box"></div><div class="label">宫寒痛经</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="女性气血不足"><div class="box"></div><div class="label">气血不足</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="月经量少有块"><div class="box"></div><div class="label">月经量少有块</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="经期提前推后"><div class="box"></div><div class="label">经期提前推后</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="经期烦躁胸胀"><div class="box"></div><div class="label">经期烦躁胸胀</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="经期腰痛头痛"><div class="box"></div><div class="label">经期腰痛头痛</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="经期小腹怕凉"><div class="box"></div><div class="label">经期小腹怕凉</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="乳房肿块增生"><div class="box"></div><div class="label">乳房肿块增生</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="白带异常"><div class="box"></div><div class="label">白带异常</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="产后脱发抑郁"><div class="box"></div><div class="label">产后脱发抑郁</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 泌尿二便类 7项 -->
+  <div class="section" data-category="urine">
+    <div class="section-header">
+      <div class="left">
+        <span class="section-icon">🚻</span>
+        <span class="section-title">泌尿二便类</span>
+        <span class="section-count">7项</span>
+      </div>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-content">
+      <div class="checkbox-grid">
+        <div class="checkbox-item" data-cb><input type="checkbox" value="尿频尿急"><div class="box"></div><div class="label">尿频尿急</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="夜尿多"><div class="box"></div><div class="label">夜尿多</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="尿不尽"><div class="box"></div><div class="label">尿不尽</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="尿分叉"><div class="box"></div><div class="label">尿分叉</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="尿液浑浊"><div class="box"></div><div class="label">尿液浑浊</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="尿道灼烧"><div class="box"></div><div class="label">尿道灼烧</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="尿黄血尿"><div class="box"></div><div class="label">尿黄血尿</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 男性专属 8项 -->
+  <div class="section" data-category="male">
+    <div class="section-header">
+      <div class="left">
+        <span class="section-icon">👨</span>
+        <span class="section-title">男性专属</span>
+        <span class="section-count">8项</span>
+      </div>
+      <span class="section-toggle">▼</span>
+    </div>
+    <div class="section-content">
+      <div class="checkbox-grid">
+        <div class="checkbox-item" data-cb><input type="checkbox" value="男性乏力腰酸"><div class="box"></div><div class="label">乏力腰酸</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="性欲低"><div class="box"></div><div class="label">性欲低</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="阴囊潮湿痒"><div class="box"></div><div class="label">阴囊潮湿痒</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="男性尿黄血尿"><div class="box"></div><div class="label">尿黄血尿</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="男性尿不尽"><div class="box"></div><div class="label">尿不尽</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="男性尿分叉"><div class="box"></div><div class="label">尿分叉</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="男性尿道灼烧"><div class="box"></div><div class="label">尿道灼烧</div></div>
+        <div class="checkbox-item" data-cb><input type="checkbox" value="遗精早泄"><div class="box"></div><div class="label">遗精早泄</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-area">
+    <button class="btn btn-primary" id="btn-submit">🔍 开始辨证分析</button>
+    <button class="btn btn-secondary" id="btn-reset">🔄 重置全部选项</button>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ 温馨提示：本内容仅为药食同源养生科普，不能替代医师诊断与临床治疗，身体持续不适请及时线下就医。
+  </div>
+
+  <div class="footer">
+    由 <span class="name">吕勇军·健康+保险</span> 提供技术支持
+  </div>
+</div>
+
+<!-- 结果页 -->
+<div id="page-result" class="result-area">
+  <div class="header">
+    <h1>📋 体质辨证报告</h1>
+    <p>46年执业老中医 · 双逻辑分析</p>
+  </div>
+
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    正在综合分析您的体质信号...
+  </div>
+
+  <div id="result-content" style="display:none;">
+    <div class="result-card">
+      <h3>一、您的体质辨证结论</h3>
+      <div id="r-conclusion"></div>
+    </div>
+
+    <div class="result-card">
+      <h3>二、身体失衡原理解读</h3>
+      <div id="r-principle"></div>
+    </div>
+
+    <div class="result-card">
+      <h3>三、专属食疗调理方案</h3>
+      <div id="r-food"></div>
+    </div>
+
+    <div class="result-card">
+      <h3>四、作息运动生活建议</h3>
+      <div id="r-life"></div>
+    </div>
+
+    <div class="result-card">
+      <h3>五、专业就医提示</h3>
+      <div id="r-advice"></div>
+    </div>
+
+    <div class="btn-area">
+      <button class="btn btn-primary" id="btn-back">🔄 重新自测</button>
+    </div>
+
+    <div class="disclaimer">
+      ⚠️ 温馨提示：本内容仅为药食同源养生科普，不能替代医师诊断与临床治疗，身体持续不适请及时线下就医。<br><br>
+      <strong>【吕勇军·健康+保险】</strong> 提供健康咨询与保险规划服务，欢迎咨询。
+    </div>
+
+    <div class="footer">
+      由 <span class="name">吕勇军·健康+保险</span> 提供技术支持
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== 初始化 ==========
+let selectedSymptoms = [];
+
+// ========== 折叠面板交互 ==========
+document.querySelectorAll('.section-header').forEach(function(header) {
+  header.addEventListener('click', function() {
+    var section = this.closest('.section');
+    section.classList.toggle('open');
+  });
+});
+
+// ========== Checkbox 交互 ==========
+document.querySelectorAll('.checkbox-item[data-cb]').forEach(function(item) {
+  item.addEventListener('click', function(e) {
+    e.preventDefault();
+    this.classList.toggle('checked');
+    var cb = this.querySelector('input[type=checkbox]');
+    cb.checked = this.classList.contains('checked');
+    updateCount();
+  });
+});
+
+function updateCount() {
+  var all = document.querySelectorAll('#page-form .checkbox-item.checked');
+  selectedSymptoms = Array.from(all).map(function(item) {
+    return item.querySelector('.label').textContent;
+  });
+  document.getElementById('checkCount').textContent = selectedSymptoms.length;
+}
+
+document.getElementById('btn-reset').addEventListener('click', function() {
+  document.querySelectorAll('.checkbox-item').forEach(function(item) {
+    item.classList.remove('checked');
+    item.querySelector('input').checked = false;
+  });
+  selectedSymptoms = [];
+  document.getElementById('checkCount').textContent = '0';
+});
+
+// ========== 提交分析 ==========
+document.getElementById('btn-submit').addEventListener('click', function() {
+  if (selectedSymptoms.length === 0) {
+    alert('请至少勾选一项身体信号再提交哦～');
+    return;
+  }
+
+  document.getElementById('page-form').style.display = 'none';
+  document.getElementById('page-result').classList.add('show');
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('result-content').style.display = 'none';
+
+  analyzeSymptoms(selectedSymptoms);
+});
+
+document.getElementById('btn-back').addEventListener('click', function() {
+  document.getElementById('page-result').classList.remove('show');
+  document.getElementById('page-form').style.display = 'block';
+});
+
+// ========== TCM 分析引擎 ==========
+function analyzeSymptoms(symptoms) {
+  var analysis = tcmAnalyze(symptoms);
+
+  setTimeout(function() {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('result-content').style.display = 'block';
+
+    document.getElementById('r-conclusion').innerHTML = analysis.conclusion;
+    document.getElementById('r-principle').innerHTML = analysis.principle;
+    document.getElementById('r-food').innerHTML = analysis.food;
+    document.getElementById('r-life').innerHTML = analysis.life;
+    document.getElementById('r-advice').innerHTML = analysis.advice;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 1500);
+}
+
+// ========== 核心辨证逻辑 ==========
+function tcmAnalyze(symptoms) {
+  // 8种体质评分
+  var scores = { qi:0, xue:0, yin:0, yang:0, tan:0, shi:0, gan:0, pi:0 };
+
+  var rules = {
+    qi:  ['易疲劳','气短','四肢乏力','睡醒乏力','嗜睡','虚胖','乏力腰酸','乏力','腰酸','心慌','胸闷','贫血','低血压'],
+    xue: ['头晕','频繁头痛','偏头痛','手脚冰凉','面色暗沉','面黄苍白','气血不足','月经量少有块','脱发白发','眼干','视物模糊'],
+    yin: ['手脚心发热','眼干','视物模糊','盗汗','消瘦','烦躁易怒','口苦口干','大便干结','尿黄血尿','失眠多梦','咽干咽痒'],
+    yang: ['怕冷','手脚冰凉','宫寒痛经','腹泻','水肿','腰酸痛','夜尿多','尿频尿急','经期小腹怕凉','大便溏稀'],
+    tan: ['胃痛胃胀','腹胀','大便溏稀','大便不成形','头沉','嗜睡','肥胖带肚','多汗','自汗盗汗','屁多屁臭'],
+    shi: ['长痘痤疮','皮肤瘙痒','头沉','口臭','大便干结','怕热','口苦口干','尿黄血尿','阴囊潮湿痒'],
+    gan: ['烦躁易怒','抑郁思虑','压力大','胸闷叹气','频繁头痛','偏头痛','眼干','失眠多梦','经期烦躁胸胀','性格急躁','心烦狂躁'],
+    pi: ['食欲不振','胃痛胃胀','腹胀','大便溏稀','大便不成形','反酸','虚胖','嗜睡','消化不良','恶心打嗝']
+  };
+
+  symptoms.forEach(function(s) {
+    Object.keys(rules).forEach(function(k) {
+      if (rules[k].indexOf(s) !== -1) scores[k]++;
+    });
+  });
+
+  // 排序确定主体质
+  var sorted = Object.keys(scores).sort(function(a, b) { return scores[b] - scores[a]; });
+  var mainType = sorted[0];
+  var subType = sorted[1];
+  var mainScore = scores[mainType];
+  var subScore = scores[subType];
+
+  // 体质名称
+  var typeNames = {
+    qi:'气虚体质', xue:'血瘀体质', yin:'阴虚体质', yang:'阳虚体质',
+    tan:'痰湿体质', shi:'湿热体质', gan:'肝郁体质', pi:'脾胃虚寒体质'
+  };
+
+  // 体质形象比喻
+  var typeMetaphor = {
+    qi:'就像手机电池老化，充不满电，续航短，容易没电关机。',
+    xue:'就像河道淤堵，水流不畅，沿岸的田地得不到灌溉，庄稼枯黄。',
+    yin:'就像锅里的水烧干了，锅底发烫，菜容易烧焦。',
+    yang:'就像冬天的暖炉火势微弱，房间烧不暖，人容易冻着。',
+    tan:'就像下水道堵塞，污水排不走，越积越多，发臭发腻。',
+    shi:'就像闷热潮湿的梅雨天，身体里像蒸笼，又热又闷又粘。',
+    gan:'就像交通堵塞，气机不通，心情烦躁，哪里都不顺畅。',
+    pi:'就像工厂的生产线坏了，原料进不来，产品出不去，停工待料。'
+  };
+
+  // 体质成因
+  var typeCause = {
+    qi:'多因久坐不动、思虑过度、长期熬夜、饮食不规律，导致脾胃运化无力，气血生化不足。',
+    xue:'多因情志郁结、寒凝血瘀、久病入络，导致血液循环受阻，血行不畅。',
+    yin:'多因熬夜伤阴、过食辛辣、情绪波动大，导致阴液亏损，虚火内生。',
+    yang:'多因贪凉饮冷、久坐空调房、过度疲劳，导致阳气被耗，温煦无力。',
+    tan:'多因饮食肥甘厚味、运动不足、脾失健运，导致水湿内停，聚而成痰。',
+    shi:'多因嗜酒嗜辣、熬夜生火、居住潮湿，导致湿热内蕴，熏蒸肌肤脏腑。',
+    gan:'多因工作压力大、情绪压抑、人际冲突，导致肝气郁结，疏泄失常。',
+    pi:'多因饮食生冷、饥饱失常、思虑过度，导致脾胃虚寒，运化无力。'
+  };
+
+  // 严重程度分级
+  var level = '';
+  var levelDesc = '';
+  if (symptoms.length <= 3) {
+    level = '轻度';
+    levelDesc = '身体刚开始发出信号，属于早期预警阶段，通过调整生活习惯和饮食调理可以很快改善。';
+  } else if (symptoms.length <= 7) {
+    level = '中度';
+    levelDesc = '身体已经持续发出多个信号，属于中期亚健康状态，需要引起重视，坚持调理才能改善。';
+  } else if (symptoms.length <= 12) {
+    level = '中重度';
+    levelDesc = '身体多个系统出现失调信号，属于较明显的亚健康状态，需要系统调理，持之以恒。';
+  } else {
+    level = '重度';
+    levelDesc = '身体多个系统均出现明显信号，属于需要重点关注的亚健康状态，建议尽快就医检查。';
+  }
+
+  // ===== 结论部分 =====
+  var conclusionHtml = `
+    <p>根据您勾选的 <strong>${symptoms.length} 项</strong> 身体信号，综合辨证分析：</p>
+    <p style="margin:16px 0;padding:16px;background:#fef9e7;border-radius:12px;border-left:4px solid #c0392b;">
+      <strong style="color:#c0392b;font-size:18px;">${typeNames[mainType]} (${level})</strong><br>
+      ${subScore > 0 ? '<span style="color:#666;">兼夹：' + typeNames[subType] + '</span>' : ''}
+    </p>
+    <p><strong>【形象理解】</strong></p>
+    <p style="color:#666;line-height:1.8;">${typeMetaphor[mainType]}</p>
+    <p style="margin-top:12px;"><strong>【成因分析】</strong></p>
+    <p style="color:#666;line-height:1.8;">${typeCause[mainType]}</p>
+    <p style="margin-top:12px;"><strong>【程度说明】</strong></p>
+    <p style="color:#666;line-height:1.8;">${levelDesc}</p>
+  `;
+
+  // ===== 原理解读 =====
+  var principleHtml = `
+    <p><strong>① 现代医学视角：细胞-血液循环原理</strong></p>
+    <p style="margin:10px 0;color:#666;line-height:1.8;">
+      人体由约 40 万亿个细胞构成，细胞的唯一能量来源是血液运输的氧气和营养物质。当血液循环受阻，细胞就会"吃不饱、喝不足"，无法正常工作，身体就会发出疲劳、乏力、怕冷、头晕等信号。
+    </p>
+    <p style="margin-top:12px;"><strong>② 中医视角：气血阴阳平衡</strong></p>
+    <p style="margin:10px 0;color:#666;line-height:1.8;">
+      中医认为，气为血之帅，血为气之母，气血运行全身，濡养脏腑。气虚则推动无力，血瘀则运行不畅，阴虚则虚火内生，阳虚则温煦不足，最终都会导致身体发出各种信号。
+    </p>
+    <p style="margin-top:12px;"><strong>③ 您的体质信号解读</strong></p>
+    <p style="margin:10px 0;color:#666;line-height:1.8;">
+      您勾选的信号，正是身体向您发出的"求救信"。这些信号提醒您：当前的生活方式或饮食习惯已经影响了气血运行，需要及时调整。
+    </p>
+  `;
+
+  // ===== 食疗方案 =====
+  var foodPlans = {
+    qi: {
+      title: '气虚体质食疗方案',
+      items: [
+        '黄芪粥：黄芪15g+大米50g，每周3次，补气健脾',
+        '党参炖鸡：党参20g+鸡肉200g，温补气血',
+        '红枣桂圆汤：红枣10枚+桂圆肉15g，养心脾、补气血',
+        '山药粥：山药50g+大米，健脾益肺'
+      ],
+      tea: '黄芪枸杞茶：黄芪10g+枸杞10粒，沸水冲泡，每日1杯',
+      avoid: '少吃生冷寒凉（冰饮、西瓜），忌空腹喝绿茶'
+    },
+    xue: {
+      title: '血瘀体质食疗方案',
+      items: [
+        '当归生姜羊肉汤：当归10g+生姜30g+羊肉，温经活血',
+        '黑木耳炒芹菜：活血通络，清理血管',
+        '红糖姜茶：经期前后饮用，活血暖宫',
+        '山楂粥：山楂15g+大米，活血化瘀'
+      ],
+      tea: '玫瑰花茶：玫瑰花6朵+红糖，疏肝活血',
+      avoid: '少吃冰冷食物，经期忌寒凉'
+    },
+    yin: {
+      title: '阴虚体质食疗方案',
+      items: [
+        '百合银耳羹：百合20g+银耳1朵，滋阴润燥',
+        '枸杞菊花粥：枸杞15g+菊花10g+大米，清肝明目',
+        '黑芝麻糊：补肾滋阴，润肠通便',
+        '麦冬玉竹汤：滋阴润肺，清虚火'
+      ],
+      tea: '麦冬玉竹茶：麦冬10g+玉竹10g，沸水冲泡',
+      avoid: '忌辛辣燥热（辣椒、羊肉、韭菜），少喝酒'
+    },
+    yang: {
+      title: '阳虚体质食疗方案',
+      items: [
+        '羊肉汤：羊肉500g+生姜30g+当归10g，温阳散寒',
+        '韭菜炒核桃：温肾助阳',
+        '桂圆红枣粥：温补心脾，养血安神',
+        '生姜红糖水：温胃散寒，适合胃寒者'
+      ],
+      tea: '生姜红茶：生姜3片+红茶5g，温阳散寒',
+      avoid: '忌生冷寒凉（冰饮、西瓜、螃蟹），注意腰腹保暖'
+    },
+    tan: {
+      title: '痰湿体质食疗方案',
+      items: [
+        '薏米红豆粥：薏米30g+红豆30g，健脾祛湿',
+        '冬瓜排骨汤：冬瓜500g+排骨，清热祛湿',
+        '陈皮普洱茶：健脾理气化湿',
+        '白萝卜汤：化痰消食，理气宽中'
+      ],
+      tea: '陈皮茯苓茶：陈皮6g+茯苓10g，健脾祛湿',
+      avoid: '少吃肥甘厚味、甜腻食物，忌暴饮暴食'
+    },
+    shi: {
+      title: '湿热体质食疗方案',
+      items: [
+        '绿豆百合汤：清热祛湿，解毒消暑',
+        '苦瓜炒蛋：清热泻火，明目解毒',
+        '芹菜炒木耳：清热利湿，凉血通便',
+        '薏米冬瓜汤：健脾祛湿，利水消肿'
+      ],
+      tea: '菊花决明子茶：菊花10g+决明子10g，清肝泻火',
+      avoid: '忌辛辣燥热、肥甘厚味，戒烟酒'
+    },
+    gan: {
+      title: '肝郁体质食疗方案',
+      items: [
+        '玫瑰花粥：玫瑰花10g+大米，疏肝理气',
+        '芹菜炒百合：清肝降火，安神除烦',
+        '陈皮炖排骨：理气健脾，疏肝解郁',
+        '佛手瓜汤：疏肝理气，和胃止痛'
+      ],
+      tea: '玫瑰花茶：玫瑰花6朵，沸水冲泡，疏肝理气',
+      avoid: '少生气，忌情绪过度波动，避免熬夜'
+    },
+    pi: {
+      title: '脾胃虚寒食疗方案',
+      items: [
+        '山药粥：山药50g+大米，健脾养胃',
+        '红枣小米粥：温补脾胃，养血安神',
+        '生姜红糖水：温中散寒，适合胃寒者',
+        '莲子芡实粥：健脾止泻，固肾涩精'
+      ],
+      tea: '陈皮红枣茶：陈皮6g+红枣5枚，健脾温中',
+      avoid: '忌生冷寒凉，规律饮食，细嚼慢咽'
+    }
+  };
+
+  var plan = foodPlans[mainType];
+  var foodHtml = `
+    <p><strong>${plan.title}</strong></p>
+    <ul style="margin:10px 0;">
+      ${plan.items.map(function(item) { return '<li>' + item + '</li>'; }).join('')}
+    </ul>
+    <p style="margin-top:10px;"><strong>日常代茶饮：</strong>${plan.tea}</p>
+    <p style="margin-top:10px;"><strong>饮食禁忌：</strong>${plan.avoid}</p>
+    <div class="tip-box">
+      💡 <strong>温馨提示：</strong>食疗调理需坚持4-8周方可见效。药食同源为温和养护，切勿急于求成。如服用后有不适，请立即停止并咨询专业人士。
+    </div>
+  `;
+
+  // ===== 生活建议 =====
+  var lifeHtml = `
+    <p><strong>① 睡眠作息</strong></p>
+    <p style="color:#666;">固定22:30前入睡，6:30-7:00起床；午休15-20分钟；睡前1小时不看手机。</p>
+    <p style="margin-top:12px;"><strong>② 情绪疏导</strong></p>
+    <p style="color:#666;">保持心情舒畅，可通过深呼吸、冥想、散步等方式释放压力；避免过度思虑和情绪波动。</p>
+    <p style="margin-top:12px;"><strong>③ 运动建议</strong></p>
+    <p style="color:#666;">每日30分钟中等强度运动（快走、慢跑、太极拳、八段锦），避免久坐超过1小时。</p>
+    <p style="margin-top:12px;"><strong>④ 穴位按摩</strong></p>
+    <p style="color:#666;">可按揉足三里、三阴交、合谷穴，每次5分钟，每日1-2次，帮助调理气血。</p>
+  `;
+
+  // ===== 就医提示 =====
+  var adviceHtml = `
+    <p><strong>【什么情况需要就医？】</strong></p>
+    <ul>
+      <li>出现急性剧烈症状（如剧烈头痛、胸痛、腹痛）</li>
+      <li>症状持续加重超过2周不见好转</li>
+      <li>出现明显消瘦、长期低热、便血等"红旗信号"</li>
+      <li>影响正常工作和生活</li>
+    </ul>
+    <p style="margin-top:10px;"><strong>【就医建议】</strong></p>
+    <p style="color:#666;">建议前往正规中医医院，由执业中医师进行系统辨证，必要时配合检查明确诊断后再制定针对性治疗方案。</p>
+    <div class="tip-box">
+      ⚠️ <strong>重要提示：</strong>本内容仅为药食同源养生科普，不能替代医师诊断与临床治疗。身体持续不适请及时线下就医，切勿延误病情。
+    </div>
+  `;
+
+  return {
+    conclusion: conclusionHtml,
+    principle: principleHtml,
+    food: foodHtml,
+    life: lifeHtml,
+    advice: adviceHtml
+  };
+}
+</script>
+
+</body>
+</html>
